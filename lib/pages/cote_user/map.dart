@@ -6,6 +6,8 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geolocator/geolocator.dart';
+import 'dart:math' as math;
+
 /*import 'package:http/http.dart' as http;
 import 'dart:convert';*/
 
@@ -251,8 +253,51 @@ class _MapPageState extends State<MapPage> {
     return timeInMinutes;
   }
 
+  Widget topWidget(double screenWidth) {
+    return Transform.rotate(
+      angle: -35 * math.pi / 180,
+      child: Container(
+        width: 1.2 * screenWidth,
+        height: 1.2 * screenWidth,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(150),
+          gradient: const LinearGradient(
+            begin: Alignment(-0.2, -0.8),
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0x007CBFCF),
+              Color(0xB316BFC4),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget bottomWidget(double screenWidth) {
+    return Container(
+      width: 1.5 * screenWidth,
+      height: 1.5 * screenWidth,
+      decoration: const BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: LinearGradient(
+          begin: Alignment(0.6, -1.1),
+          end: Alignment(0.7, 0.8),
+          colors: [
+            Color(0xDB4BE8CC),
+            Color(0x005CDBCF),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(_appBarTitle),
@@ -260,7 +305,6 @@ class _MapPageState extends State<MapPage> {
           IconButton(
             icon: Icon(Icons.local_parking),
             onPressed: () {
-              // Naviguer vers la page ListeParkingPage
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => ListeParkingPage()),
@@ -269,35 +313,69 @@ class _MapPageState extends State<MapPage> {
           ),
         ],
       ),
-      body: FlutterMap(
-        mapController: _mapController,
-        options: MapOptions(
-          center: _currentLocation ?? LatLng(36.7212737, 3.1892409),
-          zoom: 13.0,
-        ),
+      body: Stack(
         children: [
-          TileLayer(
-            urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+          Positioned(
+            top: -0.2 * screenHeight,
+            left: -0.2 * screenWidth,
+            child: topWidget(screenWidth),
           ),
-          MarkerLayer(
-            markers: _markers,
+          Positioned(
+            bottom: -0.4 * screenHeight,
+            right: -0.4 * screenWidth,
+            child: bottomWidget(screenWidth),
           ),
-          MarkerLayer(
-            markers: [
-              if (_currentLocation != null)
-                Marker(
-                  width: 80,
-                  height: 80,
-                  point: _currentLocation!,
-                  child: Icon(
-                    Icons.my_location,
-                    color: Colors.red,
-                    size: 36,
-                  ),
+          Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage(
+                    'lib/images/blue.png'), // Replace with your background image path
+                fit: BoxFit.cover,
+              ),
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 13, vertical: 3),
+            child: Center(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Color.fromARGB(255, 250, 248, 248),
+                  borderRadius: BorderRadius.circular(15),
                 ),
-            ],
+                padding: EdgeInsets.all(20),
+                child: FlutterMap(
+                  mapController: _mapController,
+                  options: MapOptions(
+                    center: _currentLocation ?? LatLng(36.7212737, 3.1892409),
+                    zoom: 13.0,
+                  ),
+                  children: [
+                    TileLayer(
+                      urlTemplate:
+                          'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                    ),
+                    MarkerLayer(
+                      markers: _markers,
+                    ),
+                    MarkerLayer(
+                      markers: [
+                        if (_currentLocation != null)
+                          Marker(
+                            width: 80,
+                            height: 80,
+                            point: _currentLocation!,
+                            child: Icon(
+                              Icons.my_location,
+                              color: Colors.red,
+                              size: 36,
+                            ),
+                          ),
+                      ],
+                    ),
+                    if (_routeLayer != null) _routeLayer!,
+                  ],
+                ),
+              ),
+            ),
           ),
-          if (_routeLayer != null) _routeLayer!,
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -328,7 +406,6 @@ class _MapPageState extends State<MapPage> {
     });
 
     if (index == 1) {
-      // Naviguer vers la page "Mes réservations"
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => MesReservationsPage()),

@@ -5,6 +5,7 @@ import 'package:carparking/pages/cote_user/reservation/paiementonline.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 class ReservationPage extends StatefulWidget {
@@ -163,9 +164,15 @@ class _ReservationPageState extends State<ReservationPage> {
                 placesDoc.data()['reservations'] ?? [];
             chevauchementTotal = false;
             for (final reservation in reservationsExistantes) {
-              final debutExistante = reservation['debut'].toDate();
-              final finExistante = reservation['fin'].toDate();
-
+              final debutExistante = reservation['debut'] != null
+                  ? reservation['debut'].toDate()
+                  : null;
+              final finExistante = reservation['fin'] != null
+                  ? reservation['fin'].toDate()
+                  : null;
+              if (debutExistante == null || finExistante == null) {
+                continue;
+              }
               if ((_debutReservation!.toDate().isBefore(finExistante) &&
                       _debutReservation!.toDate().isAfter(debutExistante)) ||
                   (_finReservation!.toDate().isBefore(finExistante) &&
@@ -314,7 +321,7 @@ class _ReservationPageState extends State<ReservationPage> {
     try {
       // Obtenir l'heure actuelle
 
-      DateTime currentTime = DateTime.now();
+      DateTime currentTime = DateTime.now().toUtc();
       print('Heure actuelle: $currentTime');
 
       // Interroger les réservations en cours
@@ -408,153 +415,263 @@ class _ReservationPageState extends State<ReservationPage> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      body: Stack(
-        children: [
-          Positioned(
-            top: -0.2 * screenHeight,
-            left: -0.2 * screenWidth,
-            child: topWidget(screenWidth),
-          ),
-          Positioned(
-            bottom: -0.4 * screenHeight,
-            right: -0.4 * screenWidth,
-            child: bottomWidget(screenWidth),
-          ),
-          Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage(
-                    'lib/images/blue.png'), // Replace with your background image path
-                fit: BoxFit.cover,
-              ),
+        body: Stack(children: [
+      Positioned(
+        top: -0.2 * screenHeight,
+        left: -0.2 * screenWidth,
+        child: topWidget(screenWidth),
+      ),
+      Positioned(
+        bottom: -0.4 * screenHeight,
+        right: -0.4 * screenWidth,
+        child: bottomWidget(screenWidth),
+      ),
+      Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage(
+                  'lib/images/blue.png'), // Replace with your background image path
+              fit: BoxFit.cover,
             ),
-            padding: EdgeInsets.symmetric(horizontal: 13, vertical: 3),
-            child: Center(
+          ),
+          padding: EdgeInsets.symmetric(horizontal: 13, vertical: 3),
+          child: Center(
               child: Container(
-                decoration: BoxDecoration(
-                  color: Color.fromARGB(255, 250, 248, 248),
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                padding: EdgeInsets.all(20),
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Form(
+                  decoration: BoxDecoration(
+                    color: Color.fromARGB(255, 250, 248, 248),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  padding: EdgeInsets.all(20),
+                  child: SingleChildScrollView(
+                      child: Column(mainAxisSize: MainAxisSize.min, children: [
+                    FittedBox(
+                      child: Text(
+                        "Parking.dz",
+                        style: GoogleFonts.montserrat(
+                          fontSize: 48,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    FittedBox(
+                      child: Text(
+                        "Réserver une place",
+                        style: GoogleFonts.montserrat(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 50),
+                    Form(
                         key: _formKey,
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text('Début de la réservation'),
-                                ElevatedButton(
-                                  onPressed: () =>
-                                      _selectDebutReservation(context),
-                                  child: Text(_debutReservation != null
-                                      ? DateFormat('dd/MM/yyyy HH:mm')
-                                          .format(_debutReservation!.toDate())
-                                      : 'Sélectionner la date'),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 20),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text('Fin de la réservation'),
-                                ElevatedButton(
-                                  onPressed: () =>
-                                      _selectFinReservation(context),
-                                  child: Text(_finReservation != null
-                                      ? DateFormat('dd/MM/yyyy HH:mm')
-                                          .format(_finReservation!.toDate())
-                                      : 'Sélectionner la date'),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 20),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text('Type de place'),
-                                ToggleButtons(
-                                  children: <Widget>[
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 16.0),
-                                      child: Text('Standard'),
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Début de la réservation',
+                                    style: GoogleFonts.montserrat(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
                                     ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 16.0),
-                                      child: Text('Handicapé'),
-                                    ),
-                                  ],
-                                  isSelected: _isSelected,
-                                  onPressed: (int index) {
-                                    setState(() {
-                                      for (int buttonIndex = 0;
-                                          buttonIndex < _isSelected.length;
-                                          buttonIndex++) {
-                                        if (buttonIndex == index) {
-                                          _isSelected[buttonIndex] = true;
-                                          _typePlace = buttonIndex == 0
-                                              ? 'standard'
-                                              : 'handicapé';
-                                        } else {
-                                          _isSelected[buttonIndex] = false;
-                                        }
-                                      }
-                                    });
-                                  },
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 20),
-                            Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: Colors.grey),
-                              ),
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 10),
-                                child: TextFormField(
-                                  decoration: InputDecoration(
-                                    hintText:
-                                        'Matricule et Marque (ex: 123543 - Peugeot 208)',
-                                    border: InputBorder.none,
                                   ),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _matriculeEtMarque = value;
-                                    });
-                                  },
+                                  ElevatedButton(
+                                    onPressed: () =>
+                                        _selectDebutReservation(context),
+                                    child: Text(
+                                      _debutReservation != null
+                                          ? DateFormat('dd/MM/yyyy HH:mm')
+                                              .format(
+                                                  _debutReservation!.toDate())
+                                          : 'Sélectionner la date',
+                                      style: GoogleFonts.montserrat(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor:
+                                          Colors.blue.withOpacity(0.5),
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 20, vertical: 10),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 20),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Fin de la réservation',
+                                    style: GoogleFonts.montserrat(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () =>
+                                        _selectFinReservation(context),
+                                    child: Text(
+                                      _finReservation != null
+                                          ? DateFormat('dd/MM/yyyy HH:mm')
+                                              .format(_finReservation!.toDate())
+                                          : 'Sélectionner la date',
+                                      style: GoogleFonts.montserrat(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor:
+                                          Colors.blue.withOpacity(0.5),
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 20, vertical: 10),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 20),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Type de place',
+                                    style: GoogleFonts.montserrat(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  ToggleButtons(
+                                    children: <Widget>[
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 16.0),
+                                        child: Text(
+                                          'Standard',
+                                          style: GoogleFonts.montserrat(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 16.0),
+                                        child: Text(
+                                          'Handicapé',
+                                          style: GoogleFonts.montserrat(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                    isSelected: _isSelected,
+                                    onPressed: (int index) {
+                                      setState(() {
+                                        for (int buttonIndex = 0;
+                                            buttonIndex < _isSelected.length;
+                                            buttonIndex++) {
+                                          if (buttonIndex == index) {
+                                            _isSelected[buttonIndex] = true;
+                                            _typePlace = buttonIndex == 0
+                                                ? 'standard'
+                                                : 'handicapé';
+                                          } else {
+                                            _isSelected[buttonIndex] = false;
+                                          }
+                                        }
+                                      });
+                                    },
+                                    renderBorder: false,
+                                    selectedColor: Colors.blue.withOpacity(0.5),
+                                    fillColor: Colors.blue.withOpacity(0.2),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 20),
+                              Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(color: Colors.grey),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10),
+                                  child: TextFormField(
+                                    decoration: InputDecoration(
+                                      hintText:
+                                          'Matricule et Marque (ex: 123543 - Peugeot 208)',
+                                      hintStyle: GoogleFonts.montserrat(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black.withOpacity(0.5),
+                                      ),
+                                      border: InputBorder.none,
+                                    ),
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _matriculeEtMarque = value;
+                                      });
+                                    },
+                                    style: GoogleFonts.montserrat(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
-                            SizedBox(height: 20),
-                            ElevatedButton(
-                              onPressed: () {
-                                if (_formKey.currentState!.validate()) {
-                                  _reserverPlace();
-                                }
-                              },
-                              child: Text('Réserver'),
-                            ),
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+                              SizedBox(height: 20),
+                              ElevatedButton(
+                                onPressed: () {
+                                  if (_formKey.currentState!.validate()) {
+                                    _reserverPlace();
+                                  }
+                                },
+                                child: Text(
+                                  'Réserver',
+                                  style: GoogleFonts.montserrat(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.blue.withOpacity(0.5),
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 40, vertical: 20),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(30),
+                                  ),
+                                ),
+                              ),
+                            ]))
+                  ])))))
+    ]));
   }
 }
