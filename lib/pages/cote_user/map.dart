@@ -1,4 +1,6 @@
 import 'package:carparking/pages/cote_user/MesReservationsPage.dart';
+import 'package:carparking/pages/cote_user/profilepage.dart';
+import 'package:carparking/pages/cote_user/reclamationuser.dart';
 import 'package:carparking/pages/cote_user/reservation/listeParking.dart';
 import 'package:carparking/pages/cote_user/reservation/reservation.dart';
 import 'package:flutter/material.dart';
@@ -11,23 +13,17 @@ import 'dart:math' as math;
 /*import 'package:http/http.dart' as http;
 import 'dart:convert';*/
 
-void main() => runApp(MyApp());
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: MapPage(),
-    );
-  }
-}
-
 class MapPage extends StatefulWidget {
+  final String userId;
+
+  MapPage({this.userId = ''});
   @override
   _MapPageState createState() => _MapPageState();
 }
 
 class _MapPageState extends State<MapPage> {
+  late String _userId;
+
   MapController _mapController = MapController();
   int _selectedIndex = 0;
   List<Marker> _markers = [];
@@ -44,6 +40,7 @@ class _MapPageState extends State<MapPage> {
     super.initState();
     _fetchPlacesFromFirebase();
     _getCurrentLocation();
+    _userId = widget.userId;
   }
 
   void _getCurrentLocation() async {
@@ -311,6 +308,18 @@ class _MapPageState extends State<MapPage> {
               );
             },
           ),
+          IconButton(
+            icon: Icon(
+                Icons.report_problem), // Add this line for the reclamation icon
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ReclamationPage(userId: _userId),
+                ), // Replace with your reclamation page
+              );
+            },
+          ),
         ],
       ),
       body: Stack(
@@ -409,6 +418,13 @@ class _MapPageState extends State<MapPage> {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => MesReservationsPage()),
+      );
+    } else if (index == 2) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+                ProfilePage(userId: _userId)), // Replace with your profile page
       );
     }
   }

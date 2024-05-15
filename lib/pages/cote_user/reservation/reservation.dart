@@ -500,7 +500,8 @@ class _ReservationPageState extends State<ReservationPage> {
                                     ),
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor:
-                                          Colors.blue.withOpacity(0.5),
+                                          const Color.fromRGBO(33, 150, 243, 1)
+                                              .withOpacity(0.5),
                                       padding: EdgeInsets.symmetric(
                                           horizontal: 20, vertical: 10),
                                       shape: RoundedRectangleBorder(

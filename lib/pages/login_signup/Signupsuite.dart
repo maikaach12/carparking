@@ -1,4 +1,3 @@
-import 'package:carparking/componant/my_button.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -51,12 +50,14 @@ class _SignUpDetailsPageState extends State<SignUpDetailsPage> {
         'email': widget.emailController.text, // Ajout du champ email
         'phoneNumber': widget.phoneNumberController.text,
         'role': 'user',
+        'desactiveparmoi': false, // Add this line
+        'active': true,
       });
 
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => MapPage(),
+          builder: (context) => MapPage(userId: userCredential.user!.uid),
         ),
       );
     } catch (e) {
@@ -198,10 +199,25 @@ class _SignUpDetailsPageState extends State<SignUpDetailsPage> {
                     ),
                   ),
                   SizedBox(height: 20),
-                  /* MyButton(
-                    onTap: () => reserve(context),
-                    text: "S'inscrire", onPressed: () {  },
-                  ),*/
+                  ElevatedButton(
+                    onPressed: () => reserve(context),
+                    child: Text(
+                      'Sign Up',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.blue,
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 30, vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),

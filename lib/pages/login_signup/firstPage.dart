@@ -1,4 +1,3 @@
-import 'package:carparking/pages/login_signup/auth_page.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:carparking/pages/login_signup/loginPage.dart';
