@@ -16,6 +16,15 @@ class AdminDashboardPage extends StatefulWidget {
 
 class _AdminDashboardPageState extends State<AdminDashboardPage> {
   bool _showSidebar = false;
+  Widget _currentPage =
+      Center(child: Text('Bienvenue sur le tableau de bord administrateur'));
+
+  void _navigateTo(Widget page) {
+    setState(() {
+      _currentPage = page;
+      _showSidebar = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,8 +44,26 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                         accountName: Text(widget.userEmail),
                         accountEmail: Text(widget.userId),
                         currentAccountPicture: CircleAvatar(
-                          child: Text('AD'),
+                          child: Text('ADMIN'),
                         ),
+                      ),
+                      ListTile(
+                        title: Text('Gérer Compte'),
+                        onTap: () {
+                          _navigateTo(ManageAccountsPage());
+                        },
+                      ),
+                      ListTile(
+                        title: Text('Gérer Parking'),
+                        onTap: () {
+                          _navigateTo(GererParkingPage());
+                        },
+                      ),
+                      ListTile(
+                        title: Text('Gérer Réclamation'),
+                        onTap: () {
+                          _navigateTo(UsersListPage());
+                        },
                       ),
                     ],
                   ),
@@ -45,14 +72,22 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
               Expanded(
                 child: Column(
                   children: [
-                    Navbar(),
+                    Navbar(
+                      onMenuTap: () {
+                        setState(() {
+                          _showSidebar = !_showSidebar;
+                        });
+                      },
+                      onHomeTap: () {
+                        _navigateTo(Center(
+                            child: Text(
+                                'Bienvenue sur le tableau de bord administrateur')));
+                      },
+                    ),
                     Expanded(
                       child: Container(
                         padding: EdgeInsets.all(20),
-                        child: Center(
-                          child: Text(
-                              'Bienvenue sur le tableau de bord administrateur'),
-                        ),
+                        child: _currentPage,
                       ),
                     ),
                   ],
@@ -89,6 +124,11 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
 }
 
 class Navbar extends StatelessWidget {
+  final VoidCallback onMenuTap;
+  final VoidCallback onHomeTap;
+
+  Navbar({required this.onMenuTap, required this.onHomeTap});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -97,44 +137,13 @@ class Navbar extends StatelessWidget {
       child: Row(
         children: [
           IconButton(
-            onPressed: () {
-              // Toggle the sidebar state here
-            },
+            onPressed: onMenuTap,
             icon: Icon(Icons.menu),
           ),
           Spacer(),
-          NavbarItem(
-            title: 'Gérer Compte',
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ManageAccountsPage(),
-                ),
-              );
-            },
-          ),
-          NavbarItem(
-            title: 'Gérer Parking',
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => GererParkingPage(),
-                ),
-              );
-            },
-          ),
-          NavbarItem(
-            title: 'Gérer Réclamation',
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => UsersListPage(),
-                ),
-              );
-            },
+          IconButton(
+            onPressed: onHomeTap,
+            icon: Icon(Icons.home),
           ),
         ],
       ),
