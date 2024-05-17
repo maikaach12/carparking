@@ -115,6 +115,18 @@ class _GererPlacePageState extends State<GererPlacePage> {
   }
 
   Future<void> _deletePlace(DocumentSnapshot document) async {
+    // Delete the place
     await _firestore.collection('placeU').doc(document.id).delete();
+
+    // Get all reservations with the place's ID
+    QuerySnapshot reservations = await _firestore
+        .collection('reservationU')
+        .where('idPlace', isEqualTo: document.id)
+        .get();
+
+    // Delete each reservation
+    for (DocumentSnapshot reservation in reservations.docs) {
+      await _firestore.collection('reservationU').doc(reservation.id).delete();
+    }
   }
 }

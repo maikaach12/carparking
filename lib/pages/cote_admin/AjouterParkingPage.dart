@@ -12,8 +12,7 @@ class _AjouterParkingPageState extends State<AjouterParkingPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late String _nom, _place, _latitude, _longitude;
-
-  late int _nbrplace;
+  late int _nombrePlace; // Added the capacity field
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +55,8 @@ class _AjouterParkingPageState extends State<AjouterParkingPage> {
                   }
                   return null;
                 },
-                onSaved: (value) => _nbrplace = int.parse(value!),
+                onSaved: (value) =>
+                    _nombrePlace = int.parse(value!), // Save the capacity
               ),
               TextFormField(
                 decoration: InputDecoration(labelText: 'Latitude'),
@@ -88,9 +88,11 @@ class _AjouterParkingPageState extends State<AjouterParkingPage> {
                     await _firestore.collection('parkingu').add({
                       'nom': _nom,
                       'place': _place,
-                      'nombrePlace': _nbrplace,
+                      'nombrePlace': _nombrePlace, // Add the capacity field
                       'position': GeoPoint(
-                          double.parse(_latitude), double.parse(_longitude)),
+                        double.parse(_latitude),
+                        double.parse(_longitude),
+                      ),
                       'id_admin': userId,
                     });
                     Navigator.pop(context);

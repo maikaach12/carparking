@@ -54,7 +54,6 @@ class SupprimerParkingPage extends StatelessWidget {
 
   Future<void> _deleteParking(DocumentSnapshot document) async {
     final parkingId = document.id;
-    JsObject currentContext = context; // Store the current context
 
     // Delete the parking document
     await _firestore.collection('parkingu').doc(parkingId).delete();
@@ -64,7 +63,6 @@ class SupprimerParkingPage extends StatelessWidget {
         .collection('placeU')
         .where('id_parking', isEqualTo: parkingId)
         .get();
-
     for (var doc in placesQuery.docs) {
       await _firestore.collection('placeU').doc(doc.id).delete();
     }
@@ -74,14 +72,12 @@ class SupprimerParkingPage extends StatelessWidget {
         .collection('reservationU')
         .where('idParking', isEqualTo: parkingId)
         .get();
-
     for (var doc in reservationsQuery.docs) {
       await _firestore.collection('reservationU').doc(doc.id).delete();
     }
 
-    // Navigate back to the previous page
-    if (currentContext != null) {
-      Navigator.of(currentContext).pop();
-    }
+    // Navigate back to the GererParkingPage after deletion
+    Navigator.of(context as BuildContext).pop(); // Close the current page
+    Navigator.pushReplacementNamed(context as BuildContext, '/gererParking');
   }
 }
