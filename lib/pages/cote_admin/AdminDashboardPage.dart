@@ -1,3 +1,4 @@
+import 'package:carparking/pages/cote_admin/gererplace.dart';
 import 'package:carparking/pages/cote_admin/listuser.dart';
 import 'package:carparking/pages/cote_admin/reclamation_admin.dart';
 import 'package:flutter/material.dart';
@@ -63,6 +64,12 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                         title: Text('Gérer Réclamation'),
                         onTap: () {
                           _navigateTo(UsersListPage());
+                        },
+                      ),
+                      ListTile(
+                        title: Text('Gérer Place'),
+                        onTap: () {
+                          _navigateTo(GererPlacePage());
                         },
                       ),
                     ],

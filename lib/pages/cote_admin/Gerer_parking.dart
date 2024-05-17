@@ -3,7 +3,6 @@ import 'package:carparking/pages/cote_admin/ModifierParkingPage.dart';
 import 'package:carparking/pages/cote_admin/SupprimerParkingPage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-//import 'package:firebase_auth/firebase_auth.dart';
 
 class GererParkingPage extends StatefulWidget {
   @override
@@ -12,17 +11,16 @@ class GererParkingPage extends StatefulWidget {
 
 class _GererParkingPageState extends State<GererParkingPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  // final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Gérer Parking'),
+        automaticallyImplyLeading: false, // Remove the back arrow
       ),
       body: Column(
         children: [
-          // Bouton pour ajouter un nouveau parking
           ElevatedButton(
             onPressed: () {
               Navigator.push(
@@ -32,7 +30,6 @@ class _GererParkingPageState extends State<GererParkingPage> {
             },
             child: Text('Ajouter un parking'),
           ),
-          // Liste des parkings existants
           StreamBuilder<QuerySnapshot>(
             stream: _firestore.collection('parkingu').snapshots(),
             builder: (context, snapshot) {
@@ -45,6 +42,30 @@ class _GererParkingPageState extends State<GererParkingPage> {
                     return ListTile(
                       title: Text(document['nom']),
                       subtitle: Text('Places : ${document['place']}'),
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              title: Text(document['nom']),
+                              content: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text('Capacité: ${document['capacite']}'),
+                                  Text('Distance: ${document['distance']}'),
+                                  Text('ID Admin: ${document['id_admin']}'),
+                                  Text('Places: ${document['place']}'),
+                                  Text(
+                                      'Places Disponibles: ${document['placesDisponible']}'),
+                                  Text(
+                                      'Position: ${document['position'].toString()}'),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      },
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -70,7 +91,6 @@ class _GererParkingPageState extends State<GererParkingPage> {
                                       SupprimerParkingPage(document: document),
                                 ),
                               );
-                              // Logique pour supprimer le parking
                             },
                           ),
                         ],

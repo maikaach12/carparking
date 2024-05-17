@@ -1,9 +1,10 @@
+import 'dart:js';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SupprimerParkingPage extends StatelessWidget {
   final DocumentSnapshot document;
-
   SupprimerParkingPage({required this.document});
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -36,13 +37,7 @@ class SupprimerParkingPage extends StatelessWidget {
                 SizedBox(width: 16.0),
                 ElevatedButton(
                   onPressed: () {
-                    _firestore
-                        .collection('parkingu')
-                        .doc(document.id)
-                        .delete()
-                        .then((_) {
-                      Navigator.pop(context);
-                    });
+                    _deleteParking(document);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,
@@ -55,5 +50,38 @@ class SupprimerParkingPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _deleteParking(DocumentSnapshot document) async {
+    final parkingId = document.id;
+    JsObject currentContext = context; // Store the current context
+
+    // Delete the parking document
+    await _firestore.collection('parkingu').doc(parkingId).delete();
+
+    // Delete related documents from the 'placeU' collection
+    final placesQuery = await _firestore
+        .collection('placeU')
+        .where('id_parking', isEqualTo: parkingId)
+        .get();
+
+    for (var doc in placesQuery.docs) {
+      await _firestore.collection('placeU').doc(doc.id).delete();
+    }
+
+    // Delete related documents from the 'reservationU' collection
+    final reservationsQuery = await _firestore
+        .collection('reservationU')
+        .where('idParking', isEqualTo: parkingId)
+        .get();
+
+    for (var doc in reservationsQuery.docs) {
+      await _firestore.collection('reservationU').doc(doc.id).delete();
+    }
+
+    // Navigate back to the previous page
+    if (currentContext != null) {
+      Navigator.of(currentContext).pop();
+    }
   }
 }

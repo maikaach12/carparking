@@ -13,15 +13,18 @@ class ModifierParkingPage extends StatefulWidget {
 class _ModifierParkingPageState extends State<ModifierParkingPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  late String _nom, _place, _latitude, _longitude;
-  late int _nbrplace;
+  late String _nom, _place, _latitude, _longitude, _idAdmin;
+  late int _capacite, _distance, _placesDisponible;
 
   @override
   void initState() {
     super.initState();
     _nom = widget.document['nom'];
     _place = widget.document['place'];
-    _nbrplace = widget.document['nombrePlace'];
+    _capacite = widget.document['capacite'];
+    _distance = widget.document['distance'];
+    _idAdmin = widget.document['id_admin'];
+    _placesDisponible = widget.document['placesDisponible'];
     _latitude = widget.document['position'].latitude.toString();
     _longitude = widget.document['position'].longitude.toString();
   }
@@ -61,16 +64,51 @@ class _ModifierParkingPageState extends State<ModifierParkingPage> {
                 onSaved: (value) => _place = value!,
               ),
               TextFormField(
-                initialValue: _nbrplace.toString(),
-                decoration: InputDecoration(labelText: 'Nombre de places'),
+                initialValue: _capacite.toString(),
+                decoration: InputDecoration(labelText: 'Capacité'),
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value!.isEmpty) {
-                    return 'Veuillez entrer le nombre de places';
+                    return 'Veuillez entrer la capacité';
                   }
                   return null;
                 },
-                onSaved: (value) => _nbrplace = int.parse(value!),
+                onSaved: (value) => _capacite = int.parse(value!),
+              ),
+              TextFormField(
+                initialValue: _distance.toString(),
+                decoration: InputDecoration(labelText: 'Distance'),
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Veuillez entrer la distance';
+                  }
+                  return null;
+                },
+                onSaved: (value) => _distance = int.parse(value!),
+              ),
+              TextFormField(
+                initialValue: _idAdmin,
+                decoration: InputDecoration(labelText: 'ID Admin'),
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Veuillez entrer l\'ID de l\'administrateur';
+                  }
+                  return null;
+                },
+                onSaved: (value) => _idAdmin = value!,
+              ),
+              TextFormField(
+                initialValue: _placesDisponible.toString(),
+                decoration: InputDecoration(labelText: 'Places disponibles'),
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Veuillez entrer le nombre de places disponibles';
+                  }
+                  return null;
+                },
+                onSaved: (value) => _placesDisponible = int.parse(value!),
               ),
               TextFormField(
                 initialValue: _latitude,
@@ -105,7 +143,10 @@ class _ModifierParkingPageState extends State<ModifierParkingPage> {
                         .update({
                       'nom': _nom,
                       'place': _place,
-                      'nombrePlace': _nbrplace,
+                      'capacite': _capacite,
+                      'distance': _distance,
+                      'id_admin': _idAdmin,
+                      'placesDisponible': _placesDisponible,
                       'position': GeoPoint(
                           double.parse(_latitude), double.parse(_longitude)),
                     });
